@@ -1,11 +1,13 @@
 import React from "react";
-import { Link, NavLink } from "react-router-dom";
+import { Link, NavLink, useLocation } from "react-router-dom";
 
 const activeStyle = {
   color: "purple",
 };
 
 export default function Header() {
+  const { pathname } = useLocation();
+
   return (
     <header>
       <nav>
@@ -16,12 +18,15 @@ export default function Header() {
             </Link>
           </li>
           <li>
-            <NavLink activeStyle={activeStyle} to="/shoes">
+            <NavLink
+              style={pathname === "/shoes" ? activeStyle : {}}
+              to="/shoes"
+            >
               Shoes
             </NavLink>
           </li>
           <li>
-            <NavLink activeStyle={activeStyle} to="/cart">
+            <NavLink style={pathname === "/cart" ? activeStyle : {}} to="/cart">
               Cart
             </NavLink>
           </li>
