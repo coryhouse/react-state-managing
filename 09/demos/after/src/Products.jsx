@@ -1,17 +1,30 @@
 import React, { useState } from "react";
 import Spinner from "./Spinner";
-import useFetch from "./services/useFetch";
 import { useParams } from "react-router-dom";
 import PageNotFound from "./PageNotFound";
-import { Link } from "react-router-dom";
+import { Link, useLoaderData } from "react-router-dom";
+
+const baseUrl = process.env.REACT_APP_API_BASE_URL;
+
+export async function loader({ params }) {
+  try {
+    const response = await fetch(
+      baseUrl + "products?category=" + params.category
+    );
+    if (response.ok) {
+      return response.json();
+    } else {
+      throw response;
+    }
+  } catch (e) {
+    throw e;
+  }
+}
 
 export default function Products() {
   const [size, setSize] = useState("");
   const { category } = useParams();
-
-  const { data: products, loading, error } = useFetch(
-    "products?category=" + category
-  );
+  const { products } = useLoaderData();
 
   function renderProduct(p) {
     return (
