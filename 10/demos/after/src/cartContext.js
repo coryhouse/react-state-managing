@@ -25,6 +25,7 @@ export function CartProvider(props) {
   );
 }
 
+// TODO: Context isn't working on 10 and 11 in current course demos. Why?
 export function useCart() {
   const context = useContext(CartContext);
   if (!context) {
