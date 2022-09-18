@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { saveShippingAddress } from "./services/shippingService";
 import { useCart } from "./cartContext";
+import { z, ZodError } from "zod";
 
 const STATUS = {
   IDLE: "IDLE",
@@ -14,6 +15,11 @@ const emptyAddress = {
   city: "",
   country: "",
 };
+
+const checkoutSchema = z.object({
+  city: z.string().min(1, "City is required"),
+  country: z.string().min(1, "Country is required"),
+});
 
 export default function Checkout() {
   const { dispatch } = useCart();
@@ -59,11 +65,24 @@ export default function Checkout() {
     }
   }
 
+  function format(err) {
+    let errors = {};
+    const formattedErrors = err.format();
+    Object.keys(formattedErrors)
+      // Ignore the _errors key since it's redundant
+      .filter((k) => k !== "_errors")
+      // Just keep the first error if the field has multiple
+      .forEach((k) => (errors[k] = formattedErrors[k]._errors[0]));
+    return errors;
+  }
+
   function getErrors(address) {
-    const result = {};
-    if (!address.city) result.city = "City is required";
-    if (!address.country) result.country = "Country is required";
-    return result;
+    const result = checkoutSchema.safeParse(address);
+    if (!result.success) {
+      const formattedResult = format(result.error);
+      return formattedResult;
+    }
+    return {};
   }
 
   if (saveError) throw saveError;
